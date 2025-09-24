@@ -1,0 +1,11 @@
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+main: main.o nodo.o nodearray.o diskmanager.o btree_utils.o search.o driver.o
+	$(CXX) $^ -o $@
+
+clean:
+	del main.exe *.o
