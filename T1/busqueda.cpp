@@ -7,9 +7,10 @@
 range_search_B_disk :: DiskManager, Int, Int, Int, vector<pair<Int,Float>>& -> Void
 Realiza una busqueda de rango en un arbol B almacenado en disco.
 */
-void range_search_B_disk(DiskManager &dm, int node_idx, int l, int u, vector<pair<int,float>> &out) {
+void range_search_B_disk(DiskManager &disck_manager, int node_idx, int l, int u, vector<pair<int,float>> &out, int &io_busquedas) {
     if (node_idx == -1) return;
-    Nodo node = dm.read_node_at(node_idx);
+    io_busquedas++;
+    Nodo node = disck_manager.read_node_at(node_idx);
     if (!node.es_interno) {
         for (int i = 0; i < node.k; ++i)
             if (node.pares[i].llave >= l && node.pares[i].llave <= u)
@@ -17,7 +18,7 @@ void range_search_B_disk(DiskManager &dm, int node_idx, int l, int u, vector<pai
     } else {
         for (int i = 0; i <= node.k; ++i)
             if (node.hijos[i] != -1)
-                range_search_B_disk(dm, node.hijos[i], l, u, out);
+                range_search_B_disk(disck_manager, node.hijos[i], l, u, out, io_busquedas);
     }
 }
 
@@ -25,28 +26,30 @@ void range_search_B_disk(DiskManager &dm, int node_idx, int l, int u, vector<pai
 range_search_Bplus_disk :: DiskManager, Int, Int, Int -> vector<pair<Int,Float>>
 Realiza una busqueda de rango en un arbol B+ almacenado en disco.
 */
-vector<pair<int,float>> range_search_Bplus_disk(DiskManager &dm, int root_idx, int l, int u) {
-    if (root_idx == -1) return {};
-    int cur_idx = root_idx;
+vector<pair<int,float>> range_search_Bplus_disk(DiskManager &disck_manager, int indice_raiz, int l, int u, int &io_busquedas) {
+    if (indice_raiz == -1) return {};
+    int indice_actual = indice_raiz;
     while (true) {
-        Nodo node = dm.read_node_at(cur_idx);
+        io_busquedas++;
+        Nodo node = disck_manager.read_node_at(indice_actual);
         if (!node.es_interno) {
             vector<pair<int,float>> out;
-            int iter_idx = cur_idx;
-            while (iter_idx != -1) {
-                Nodo leaf = dm.read_node_at(iter_idx);
-                for (int i = 0; i < leaf.k; ++i) {
-                    if (leaf.pares[i].llave >= l && leaf.pares[i].llave <= u)
-                        out.emplace_back(leaf.pares[i].llave, leaf.pares[i].valor);
-                    else if (leaf.pares[i].llave > u)
+            int indice_iterador = indice_actual;
+            while (indice_iterador != -1) {
+                io_busquedas++;
+                Nodo hoja = disck_manager.read_node_at(indice_iterador);
+                for (int i = 0; i < hoja.k; ++i) {
+                    if (hoja.pares[i].llave >= l && hoja.pares[i].llave <= u)
+                        out.emplace_back(hoja.pares[i].llave, hoja.pares[i].valor);
+                    else if (hoja.pares[i].llave > u)
                         return out;
                 }
-                iter_idx = leaf.siguiente;
+                indice_iterador = hoja.siguiente;
             }
             return out;
         } else {
             int child = find_child_index(node, l);
-            cur_idx = node.hijos[child];
+            indice_actual = node.hijos[child];
         }
     }
 }

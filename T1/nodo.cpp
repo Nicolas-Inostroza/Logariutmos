@@ -1,5 +1,9 @@
 #include "nodo.h"
 
+/*
+Nodo :: Constructor
+Inicializa un nodo con valores por defecto.
+*/
 Nodo::Nodo() {
     es_interno = 0;
     k = 0;

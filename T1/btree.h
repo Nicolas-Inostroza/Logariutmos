@@ -7,6 +7,12 @@
 void insert_pair_in_node(Nodo &node, int key, float val);
 int find_child_index(const Nodo &node, int key);
 
+
+/*
+SplitResult :: struct
+Estructura que representa el resultado de dividir un nodo.
+Contiene los nodos izquierdo y derecho, y el par llave-valor del medio.
+*/
 struct SplitResult {
     Nodo left, right;
     int med_llave;

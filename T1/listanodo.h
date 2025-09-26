@@ -3,6 +3,11 @@
 
 #include "nodo.h"
 
+/*
+ListaNodo :: struct
+Estructura que representa una lista de nodos en memoria.
+Contiene un vector de nodos y contadores de lecturas y escrituras.
+*/
 struct ListaNodo {
     std::vector<Nodo> nodes;
     uint64_t reads = 0;

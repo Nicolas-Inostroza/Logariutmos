@@ -38,25 +38,28 @@ int main() {
 
         double sum_time = 0.0;
         size_t sum_ios = 0;
+        int io_busquedas = 0;
         mt19937 rng(42);
         uniform_int_distribution<int> distL(MIN_KEY, MAX_KEY - RANGE_SIZE);
-
+        
         for (int q = 0; q < Q; q++) {
             int l = distL(rng);
             int u = l + RANGE_SIZE;
             vector<pair<int,float>> res;
             auto tq1 = chrono::high_resolution_clock::now();
-            range_search_B_disk(dmB, root_idx_B, l, u, res);
+            range_search_B_disk(dmB, root_idx_B, l, u, res, io_busquedas);
             auto tq2 = chrono::high_resolution_clock::now();
             sum_time += chrono::duration<double, milli>(tq2 - tq1).count();
             double pct = 100.0 * res.size() / N;
+            sum_ios += io_busquedas;
             cout << "[B] Consulta " << q << " -> " << res.size()
-                 << " resultados (" << pct << "%)\n";
+                 << " resultados (" << pct << "%)" << ", ios_busqueda" << io_busquedas << "\n";
         }
 
         double avg_time = sum_time / Q;
+        double avg_ios = double(sum_ios) / Q; 
         out << "B," << N << "," << ios_insert << "," << nodos << "," << tam_bytes
-            << "," << avg_time << "," << sum_ios << "," << tiempo_insert_ms << "\n";
+            << "," << avg_time << "," << avg_ios << "," << tiempo_insert_ms << "\n";
 
         // =============== B+ Tree ===============
         vector<pair<int,float>> datosBp = leer_datos(datos_file, N);
@@ -75,22 +78,24 @@ int main() {
 
         sum_time = 0.0;
         sum_ios = 0;
-
+        io_busquedas = 0;
         for (int q = 0; q < Q; q++) {
             int l = distL(rng);
             int u = l + RANGE_SIZE;
             auto tq1 = chrono::high_resolution_clock::now();
-            auto res = range_search_Bplus_disk(dmBp, root_idx_Bp, l, u);
+            auto res = range_search_Bplus_disk(dmBp, root_idx_Bp, l, u, io_busquedas);
             auto tq2 = chrono::high_resolution_clock::now();
             sum_time += chrono::duration<double, milli>(tq2 - tq1).count();
             double pct = 100.0 * res.size() / N;
+            sum_ios += io_busquedas;
             cout << "[B+] Consulta " << q << " -> " << res.size()
-                 << " resultados (" << pct << "%)\n";
+                 << " resultados (" << pct << "%)" << ", ios_busqueda" << io_busquedas << "\n";
         }
 
         avg_time = sum_time / Q;
+        avg_ios = double(sum_ios) / Q; 
         out << "B+," << N << "," << ios_insert << "," << nodos << "," << tam_bytes
-            << "," << avg_time << "," << sum_ios << "," << tiempo_insert_ms << "\n";
+            << "," << avg_time << "," << avg_ios << "," << tiempo_insert_ms << "\n";
     }
     return 0;
 }
