@@ -101,11 +101,12 @@ void insert(ListaNodo &lista_nodos, int &indice_raiz, int llave, float valor, bo
     if (raiz.k < B) {
         insert_recursive(lista_nodos, indice_raiz, llave, valor, es_Bplus);
     } else {
-        //Si la raiz esta llena es decir k=B, se divide con sl¿plit_node y se crea una nueva raiz
+        //Si la raiz esta llena es decir k=B, se divide con split_node y se crea una nueva raiz
         SplitResult separados = split_node(raiz, es_Bplus);
         int indice_der = lista_nodos.append(separados.right);
         lista_nodos.write(indice_raiz, separados.left);
         
+        //Iniciamos la nueva raiz con los valores correspondientes
         Nodo nueva_raiz;
         nueva_raiz.es_interno = 1;
         nueva_raiz.k = 1;
@@ -113,6 +114,7 @@ void insert(ListaNodo &lista_nodos, int &indice_raiz, int llave, float valor, bo
         nueva_raiz.pares[0].valor = separados.med_valor;
         nueva_raiz.hijos[0] = indice_raiz;
         nueva_raiz.hijos[1] = indice_der;
+
 
         indice_raiz = lista_nodos.append(nueva_raiz);
 
@@ -135,8 +137,11 @@ Si el nodo es hoja y no tiene espacio, se divide el nodo y se inserta el par en 
 Si el nodo es interno, se busca el hijo correspondiente y se llama recursivamente a insert_recursive.
 */
 void insert_recursive(ListaNodo &lista_nodos, int indice_nodo, int llave, float valor, bool es_Bplus) {
+
     Nodo nodo_actual = lista_nodos.read(indice_nodo);
+    // Vemos si estamos en una hoja
     if (!nodo_actual.es_interno) {
+        // Si el nodo tiene espacio insertamos el par directamente, sino se separa el nodo en dos y se actualiza "el arbol" con los cambios.
         if (nodo_actual.k < B) {
             insert_pair_in_node(nodo_actual, llave, valor);
             lista_nodos.write(indice_nodo, nodo_actual);
@@ -149,6 +154,7 @@ void insert_recursive(ListaNodo &lista_nodos, int indice_nodo, int llave, float 
     } else {
         int child_rel = find_child_index(nodo_actual, llave);
         int child_idx = nodo_actual.hijos[child_rel];
+        // Si el hijo no existe, se crea uno nuevo y se inserta el par ahi.
         if (child_idx == -1) {
             Nodo nuevo;
             int nuevo_idx = lista_nodos.append(nuevo);
